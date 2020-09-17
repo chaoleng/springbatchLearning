@@ -1,5 +1,8 @@
 package com.batch.springbatch.config;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.sql.DataSource;
 
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -8,6 +11,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -15,6 +19,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.batch.springbatch.model.MainDo;
+import com.batch.springbatch.model.Student;
 import com.batch.springbatch.reader.InMemoryMainReader;
 
 @Configuration
@@ -36,6 +41,9 @@ public class JobDemo {
 	@Autowired
 	@Qualifier("OutputViewItemWriter")
 	private ItemWriter<? super MainDo> outputViewItemWriter;
+	
+	@Autowired
+    private ItemProcessor<MainDo, MainDo> mainProccProcessor;
 
 	/* 1、创建一个Job作业 */
 	@Bean
@@ -49,6 +57,7 @@ public class JobDemo {
 		return stepBuilderFactory.get("chunkStep")
 				.<MainDo,MainDo>chunk(10) // 每chunkSize次提交一次
 				.reader(databaseItemReader()) // 读取数据库，并把库表中每列数据映射到工程中的User bean中
+				.processor(mainProccProcessor)
 				.writer(outputViewItemWriter)
 				.allowStartIfComplete(true)
 				.build();
@@ -75,5 +84,5 @@ public class JobDemo {
 		return new InMemoryMainReader();
 
 	}
-
+	
 }
