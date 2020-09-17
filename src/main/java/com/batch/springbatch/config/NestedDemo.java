@@ -24,9 +24,6 @@
 //	private JobBuilderFactory jobBuilderFactory;
 //	
 //	@Autowired
-//	private StepBuilderFactory stepBuilderFactory;
-//	
-//	@Autowired
 //	private Job childJobOne;
 //	
 //	@Autowired

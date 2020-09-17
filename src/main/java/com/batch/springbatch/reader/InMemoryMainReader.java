@@ -5,11 +5,13 @@ import java.util.Collections;
 import java.util.List;
 
 import org.springframework.batch.item.ItemReader;
+import org.springframework.stereotype.Component;
 
 import com.batch.springbatch.model.MainDo;
 import com.batch.springbatch.model.Person;
 import com.batch.springbatch.model.Student;
 
+@Component
 public class InMemoryMainReader implements ItemReader<MainDo> {
 	 
     private int nextStudentIndex;

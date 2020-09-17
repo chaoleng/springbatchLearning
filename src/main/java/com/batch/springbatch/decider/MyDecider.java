@@ -1,13 +1,13 @@
-package com.batch.springbatch.config;
+package com.batch.springbatch.decider;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
+import org.springframework.stereotype.Component;
 
-import io.micrometer.core.instrument.distribution.CountAtBucket;
-
-public class myDecider implements JobExecutionDecider {
+@Component
+public class MyDecider implements JobExecutionDecider {
 
 	private int count;
 	
