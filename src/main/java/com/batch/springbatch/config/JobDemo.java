@@ -1,5 +1,6 @@
 package com.batch.springbatch.config;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -22,6 +23,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import com.batch.springbatch.model.MainDo;
+import com.batch.springbatch.model.MainDoObject;
+import com.batch.springbatch.model.Person;
 import com.batch.springbatch.reader.InMemoryMainReader;
 
 @Configuration
@@ -43,6 +46,9 @@ public class JobDemo {
 	
 	@Autowired
 	private InMemoryMainReader inMemoryMainReader;
+	
+	@Autowired
+	private MainDoObject mainDoObject;
 
 	/* 1、创建一个Job作业 */
 	@Bean
@@ -57,8 +63,8 @@ public class JobDemo {
 	// 2、创建一个step*/
 	@Bean
 	public Step chunkStep1() {
-		return stepBuilderFactory.get("chunkStep")
-				.<Integer, Integer>chunk(10) // 每chunkSize次提交一次
+		return stepBuilderFactory.get("chunkStep1")
+				.<Integer, Integer>chunk(100) // 每chunkSize次提交一次
 				.reader(itemReader()) // 读取数据库，并把库表中每列数据映射到工程中的User bean中
 //				.processor(mainProccProcessor)
 				.writer(itemWriter())
@@ -68,6 +74,8 @@ public class JobDemo {
 	
 	@Bean
 	public ItemReader<Integer> itemReader() {
+//		ItemReader<String> reader = new ListItemReader<String>();
+		
 		return new ListItemReader<>(Arrays.asList(1, 2, 3, 4));
 	}
 	
@@ -75,28 +83,25 @@ public class JobDemo {
     public ItemWriter<Integer> itemWriter() {
         return new ItemWriter<Integer>() {
 
-            private StepExecution stepExecution;
-
             @Override
             public void write(List<? extends Integer> items) throws Exception {
                 for (Integer item : items) {
                     System.out.println("item = " + item);
                 }
-                stepExecution.getJobExecution().getExecutionContext().put("data", "foo");
+                Person person = new Person();
+                person.setFirstName("zhang");
+                person.setLastName("san");
+                List<Person> persons = new ArrayList<Person>();
+                persons.add(person);
+                mainDoObject.setPersons(persons);
             }
-
-            @BeforeStep
-            public void saveStepExecution(StepExecution stepExecution) {
-                this.stepExecution = stepExecution;
-            }
-
         };
     }
 	
 	@Bean
 	public Step chunkStep2() {
-		return stepBuilderFactory.get("chunkStep")
-				.<MainDo,MainDo>chunk(10) // 每chunkSize次提交一次
+		return stepBuilderFactory.get("chunkStep2")
+				.<MainDo,MainDo>chunk(100) // 每chunkSize次提交一次
 				.reader(inMemoryMainReader) // 读取数据库，并把库表中每列数据映射到工程中的User bean中
 				.processor(mainProccProcessor)
 				.writer(outputViewItemWriter)
